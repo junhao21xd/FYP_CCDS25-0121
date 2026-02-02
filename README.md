@@ -51,4 +51,11 @@ This framework supports analysis on **IEMOCAP** and **MSP-Podcast**.
 * **Status:** Preprocessing pipeline included.
 * **Access:** Request directly from [UTD MSP Lab](https://www.lab-msp.com/MSP/MSP-Podcast.html).
 
+---
 
+## Acknowledgements & Credits
+This project is an evolution of the SpeechCueLLM framework.
+
+Original Architecture: SpeechCueLLM (https://github.com/zehuiwu/SpeechCueLLM)
+
+Modifications: This implementation extends the original work by integrating OpenSMILE, introducing Dynamic Masking, and refactoring the prompting strategy for Llama-3 optimization.
