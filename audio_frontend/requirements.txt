@@ -1,0 +1,6 @@
+audb>=1.2.5
+audmetric>=1.1.3
+audonnx>=0.6.2
+audplot>=1.4.0
+opensmile>=2.4.0
+transformers
