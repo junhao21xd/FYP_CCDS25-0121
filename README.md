@@ -30,8 +30,10 @@ A standalone module designed to handle raw signal processing.
 ### 2. The LLM Engine (Llama-3)
 The core reasoning engine takes the processed inputs and generates emotion predictions.
 
-![Proposed Prompt](asset/speechcuellm_prompt_proposed.png)
-*Figure 2: New Structured Prompt format.*
+<div align="center">
+  <img src="asset/speechcuellm_prompt_proposed.png" width="85%" alt="Proposed Prompt">
+  <p><em>Figure 2: New Structured Prompt format.</em></p>
+</div>
 
 ---
 
