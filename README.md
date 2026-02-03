@@ -1,3 +1,4 @@
+![Status](https://img.shields.io/badge/Status-Work_in_Progress-yellow)
 # FYP_CCDS25-0121: Multimodal SER with Llama-3 & Structured Prompting
 
 **A robust Multimodal Speech Emotion Recognition (SER) framework that fine-tunes Llama-3 to process audio features alongside textual transcription.**
