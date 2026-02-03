@@ -572,8 +572,8 @@ def main():
     df_train = processed_df[processed_df['split']=='train']
     df_test = processed_df[processed_df['split']=='test']
     
-    prepare_and_save_json(df_train, '/home/FYP/jyau005/SpeechCueLLM-main/IEMOCAP_data_norm_VAD_grouped/train.json')
-    prepare_and_save_json(df_test, '/home/FYP/jyau005/SpeechCueLLM-main/IEMOCAP_data_norm_VAD_grouped/test.json')
+    prepare_and_save_json(df_train, '/path/to/IEMOCAP_data_norm_VAD_grouped/train.json')
+    prepare_and_save_json(df_test, '/path/to/IEMOCAP_data_norm_VAD_grouped/test.json')
 
 
 if __name__ == "__main__":

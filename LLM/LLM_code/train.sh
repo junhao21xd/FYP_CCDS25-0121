@@ -55,9 +55,9 @@ historical_window=8
 
 data_percent=1.0
 
-#checkpoint_dir="/home/FYP/jyau005/SpeechCueLLM-main/experiments/LLaMA3-instruct/lora/msp/window_12/LR_1e-5_BS_8_per_1.0_des_context_msp_large_new_mask_class5_11/best"
-#checkpoint_dir="/home/FYP/jyau005/SpeechCueLLM-main/experiments/LLaMA3-instruct/lora/iemocap/window_8/LR_1e-5_BS_8_per_1.0_des_context_iemocap_mask_sorted_class5_11/best"
-DATA_PATH="/home/FYP/jyau005/SpeechCueLLM-main/IEMOCAP_data_audeer_finetuned"
+#checkpoint_dir="/path/to/experiments/LLaMA3-instruct/lora/msp/window_12/LR_1e-5_BS_8_per_1.0_des_context_msp_large_new_mask_class5_11/best"
+#checkpoint_dir="/path/to/experiments/LLaMA3-instruct/lora/iemocap/window_8/LR_1e-5_BS_8_per_1.0_des_context_iemocap_mask_sorted_class5_11/best"
+DATA_PATH="/path/to/IEMOCAP_data_audeer_finetuned"
 
 # -----------------------------------------------------------------------------
 
@@ -189,7 +189,7 @@ then
     fi
     
     echo "Processed Data_Path: $DATA_PATH"
-    deepspeed --master_port=${port} main_train_proposed.py \
+    deepspeed --master_port=${port} main_train.py \
     --dataset ${dataset} \
     --model_name_or_path ${MODEL_PATH} \
     --data_dir ${DATA_PATH} \

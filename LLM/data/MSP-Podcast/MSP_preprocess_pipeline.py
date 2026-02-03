@@ -8,7 +8,7 @@ import re
 ds = load_dataset("AbstractTTS/PODCAST", split="train")
 # ds = ds.shuffle(seed=42)
 # Directory to save wavs
-wav_dir = "/home/FYP/jyau005/MSP_dataset/wav_outputs"
+wav_dir = "/path/to/MSP_dataset/wav_outputs"
 os.makedirs(wav_dir, exist_ok=True)
 
 create_wav_file = False

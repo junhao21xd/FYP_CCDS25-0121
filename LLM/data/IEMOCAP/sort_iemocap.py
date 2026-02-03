@@ -55,12 +55,12 @@ def create_order_index(iemocap_root_path):
 
 # 1. Generate the mapping
 # Replace with your actual IEMOCAP path
-iemocap_path = "/path/to/SpeechCueLLM-main/IEMOCAP_full_release/Session*/dialog/transcriptions" 
+iemocap_path = "/path/to/IEMOCAP_full_release/Session*/dialog/transcriptions" 
 df_order = create_order_index(iemocap_path)
 
 # 2. Load your existing CSV
 # Assuming your CSV has a column 'Utterance_ID' to match on
-my_existing_csv = pd.read_csv("/path/to/SpeechCueLLM-main/speech_features/iemocap_egemaps_features_filtered_subset.csv") 
+my_existing_csv = pd.read_csv("/path/to/speech_features/iemocap_egemaps_features_filtered_subset.csv") 
 
 # 3. Merge the new 'Order_Index' into your data
 # We merge on Utterance_ID to ensure the index matches the specific wav file
@@ -73,4 +73,4 @@ df_final = pd.merge(my_existing_csv, df_order[['id', 'Order_Index']],
 df_final = df_final.sort_values(by=['video_id', 'Order_Index'])
 
 print(df_final.head())
-df_final.to_csv('/path/to/SpeechCueLLM-main/speech_features/iemocap_egemaps_features_filtered_subset_sorted.csv',index=False)
+df_final.to_csv('/path/to/speech_features/iemocap_egemaps_features_filtered_subset_sorted.csv',index=False)
