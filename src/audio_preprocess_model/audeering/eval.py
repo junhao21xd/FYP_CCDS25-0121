@@ -10,11 +10,15 @@ from tqdm import tqdm
 from scipy.stats import pearsonr
 
 # --- CONFIGURATION ---
-MODEL_PATH = "/home/FYP/jyau005/audeer/wav2vec2_vad_iemocap_final_fp16"  # Path where you saved the trained model
-#MODEL_PATH = "audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim"
 EXTRACTOR_PATH = "audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim"
-TEST_FILE = "../data/test_vad_ready.json"    # Path to your processed test json
-BATCH_SIZE = 8                       # Adjust based on your GPU VRAM
+
+#MODEL_PATH = "audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim" # Pretrained model path
+MODEL_PATH = "/path/to/audeer/wav2vec2_vad_iemocap_final_fp16"  # Path where you saved the trained model
+
+TEST_FILE = "../iemocap_data/test_vad_ready.json"    # Path to your processed test json
+
+output_csv = "iemocap_predictions.csv"
+BATCH_SIZE = 8
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 # ---------------------
 
@@ -198,7 +202,7 @@ def evaluate():
         "pred_valence": all_preds[:, 2],
         "true_valence": all_labels[:, 2],
     })
-    df.to_csv("msp_predictions.csv", index=False)
+    df.to_csv(output_csv, index=False)
     print("\nDetailed predictions saved to 'predictions.csv'")
 
 if __name__ == "__main__":

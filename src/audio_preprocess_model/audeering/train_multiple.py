@@ -14,6 +14,11 @@ from transformers import (
     EvalPrediction
 )
 import json
+
+# Load Pretrained Components
+model_name = 'audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim'
+data_path = '../iemocap_data_multiple'
+dataset = 'iemocap'
 # ---------------------------------------------------------
 # 1. LOSS FUNCTION (Concordance Correlation Coefficient)
 # ---------------------------------------------------------
@@ -99,9 +104,6 @@ class EmotionModel(Wav2Vec2PreTrainedModel):
             padding_mask = self._get_feature_vector_attention_mask(hidden_states.shape[1], attention_mask)
             hidden_states[~padding_mask] = 0.0
             hidden_states = hidden_states.sum(dim=1) / padding_mask.sum(dim=1).view(-1, 1)
-            #padding_mask = padding_mask.unsqueeze(-1).type_as(hidden_states)
-            #hidden_states = hidden_states * padding_mask
-            #hidden_states = hidden_states.sum(dim=1) / padding_mask.sum(dim=1).clamp(min=1e-6)
 
         logits = self.classifier(hidden_states)
 
@@ -129,13 +131,8 @@ class VADDataset(Dataset):
     def __getitem__(self, idx):
         item = self.data_list[idx]
         
-        # Load audio (Replace this with your actual loading logic)
-        # Using librosa to ensure 16kHz
+        # Load audio
         audio, _ = librosa.load(item['path'], sr=self.sampling_rate)
-        
-        # --- DUMMY AUDIO FOR DEMONSTRATION ---
-        #audio = np.random.uniform(-1, 1, 16000 * 3) # 3 seconds noise
-        # -------------------------------------
 
         # Process audio
         inputs = self.processor(audio, sampling_rate=self.sampling_rate, return_tensors="pt")
@@ -167,71 +164,59 @@ class DataCollatorWithPadding:
 # 4. TRAINING SETUP
 # ---------------------------------------------------------
 
-# Load Pretrained Components
-model_name = 'audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim'
-processor = Wav2Vec2Processor.from_pretrained(model_name)
-model = EmotionModel.from_pretrained(model_name)
+for ses in range(1,6):
+    processor = Wav2Vec2Processor.from_pretrained(model_name)
+    model = EmotionModel.from_pretrained(model_name)
+    with open(f'{data_path}/train_vad_ready_sess{ses}.json') as f:
+        train_data = json.load(f)
 
-with open('../data/train_vad_ready.json') as f:
-    train_data = json.load(f)
+    with open(f'{data_path}/test_vad_ready_sess{ses}.json') as f:
+        eval_data = json.load(f)
 
-with open('../data/test_vad_ready.json') as f:
-    eval_data = json.load(f)
+    train_dataset = VADDataset(train_data, processor)
+    eval_dataset = VADDataset(eval_data, processor)
+    data_collator = DataCollatorWithPadding(processor=processor)
 
-# --- PREPARE DUMMY DATA ---
-# Replace this with your CSV loading logic
-# Labels should be: [Arousal, Dominance, Valence]
-#train_data = [{'path': 'file1.wav', 'labels': [0.5, 0.5, 0.5]} for _ in range(20)]
-#eval_data = [{'path': 'file2.wav', 'labels': [0.6, 0.4, 0.7]} for _ in range(5)]
+    # Metrics
+    def compute_metrics(p: EvalPrediction):
+        #preds = p.predictions
+        preds = p.predictions[0] if isinstance(p.predictions, tuple) else p.predictions
 
-train_dataset = VADDataset(train_data, processor)
-eval_dataset = VADDataset(eval_data, processor)
-data_collator = DataCollatorWithPadding(processor=processor)
+        labels = p.label_ids
+        # Simple MSE for logging (Loss handles CCC)
+        mse = ((preds - labels)**2).mean().item()
+        return {"mse": mse}
 
-# Metrics
-def compute_metrics(p: EvalPrediction):
-    #preds = p.predictions
-    preds = p.predictions[0] if isinstance(p.predictions, tuple) else p.predictions
+    # Training Arguments
+    training_args = TrainingArguments(
+        output_dir=f"../wav2vec2_vad_{dataset}_finetuned_sess{ses}",
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=8,
+        gradient_accumulation_steps=4,
+        eval_strategy="steps",
+        num_train_epochs=5,
+        fp16=True if torch.cuda.is_available() else False,
+        #fp16=False,
+        save_steps=100,
+        eval_steps=100,
+        logging_steps=50,
+        learning_rate=1e-4, # Higher LR for the head
+        save_total_limit=1,
+        remove_unused_columns=False,
+        label_names=["labels"],
+        load_best_model_at_end=True,
+    )
 
-    labels = p.label_ids
-    # Simple MSE for logging (Loss handles CCC)
-    mse = ((preds - labels)**2).mean().item()
-    return {"mse": mse}
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        tokenizer=processor.feature_extractor,
+        data_collator=data_collator,
+        compute_metrics=compute_metrics,
+    )
 
-# Training Arguments
-training_args = TrainingArguments(
-    output_dir="../wav2vec2_vad_finetuned_fp16",
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    gradient_accumulation_steps=4,
-    eval_strategy="steps",
-    num_train_epochs=5,
-    fp16=True if torch.cuda.is_available() else False,
-    #fp16=False,
-    save_steps=100,
-    eval_steps=100,
-    logging_steps=25,
-    learning_rate=1e-4, # Higher LR for the head
-    save_total_limit=1,
-    remove_unused_columns=False,
-    label_names=["labels"],
-    load_best_model_at_end=True,
-)
-
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    eval_dataset=eval_dataset,
-    tokenizer=processor.feature_extractor,
-    data_collator=data_collator,
-    compute_metrics=compute_metrics,
-)
-
-# Start Training
-print("Starting training...")
-trainer.train()
-
-# Save final model
-trainer.save_model("../wav2vec2_vad_iemocap_final_fp16")
-#processor.save_pretrained("../wav2vec2_vad_iemocap_final")
+    # Start Training
+    print("Starting training...")
+    trainer.train()

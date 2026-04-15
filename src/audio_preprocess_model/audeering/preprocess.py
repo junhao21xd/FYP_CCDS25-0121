@@ -4,15 +4,15 @@ from sklearn.preprocessing import MinMaxScaler
 
 # --- CONFIGURATION ---
 # Change these to match your actual filenames
-TRAIN_FILE = '/home/FYP/jyau005/SpeechCueLLM-main/MSP_data/train.json'
-TEST_FILE = '/home/FYP/jyau005/SpeechCueLLM-main/MSP_data/test.json'
-
+TRAIN_FILE = '../../data/MSP_data/train.json'
+TEST_FILE = '../../data/MSP_data/test.json'
+output_data_path = '../../data/audeering/msp_data'
 # Change these to match the exact field names in your current JSON
 # e.g., if your json has "val", "act", "dom", change them below.
 FIELD_MAP = {
-    'valence': 'EmoVal', 
-    'arousal': 'EmoAct', 
-    'dominance': 'EmoDom',
+    'valence': 'valence', 
+    'arousal': 'arousal', 
+    'dominance': 'dominance',
     'path': 'path'  # Field containing the audio filename
 }
 # ---------------------
@@ -43,17 +43,6 @@ def process_file(input_path, output_path, scaler=None):
     # Transform the values
     scaled_values = scaler.transform(df[[a_col, d_col, v_col]])
     
-    # 4. Format into [Arousal, Dominance, Valence] lists
-    # Note: The scaler was fitted on [A, D, V] order above, so it returns that order.
-    # But just to be safe and explicit about the model's requirement:
-    
-    # Let's do it manually to ensure order is A-D-V strictly
-    # Re-normalize column by column if we want strict control, 
-    # but using the scaler on the correct column order is cleaner.
-    
-    # Create the 'labels' column
-    # The scaler returns a numpy array of shape (N, 3). 
-    # We turn it into a list of lists.
     df['labels'] = scaled_values.tolist()
     
     # 5. Save new JSON with only necessary fields
@@ -67,9 +56,9 @@ def process_file(input_path, output_path, scaler=None):
 
 # --- EXECUTION ---
 # 1. Process Train (and learn the min/max scaling from it)
-scaler = process_file(TRAIN_FILE, '../msp_data/train_vad_ready.json', scaler=None)
+scaler = process_file(TRAIN_FILE, f'{output_data_path}/train_vad_ready.json', scaler=None)
 
 # 2. Process Test (using the scaling logic from Train)
-process_file(TEST_FILE, '../msp_data/test_vad_ready.json', scaler=scaler)
+process_file(TEST_FILE, f'{output_data_path}/test_vad_ready.json', scaler=scaler)
 
 print("\nDone! Use 'train_vad_ready.json' and 'test_vad_ready.json' in your training script.")

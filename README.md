@@ -1,9 +1,9 @@
-![Status](https://img.shields.io/badge/Status-Work_in_Progress-yellow)
-# FYP_CCDS25-0121: Multimodal SER with Llama-3 & Structured Prompting
+<!-- ![Status](https://img.shields.io/badge/Status-Work_in_Progress-yellow) -->
+# FYP_CCDS25-0121: Multimodal SER with Llama-3
 
 **A robust Multimodal Speech Emotion Recognition (SER) framework that fine-tunes Llama-3 to process audio features alongside textual transcription.**
 
-> **Key Result:** Achieved **72.4% Accuracy** on IEMOCAP (SOTA-competitive) by implementing structured prompting and dynamic feature masking.
+> **Key Result:** Achieved **72.0% Macro-F1** on IEMOCAP (SOTA-competitive) and **25.1% Macro-F1** in MSP-Podcast (Fine-Grained Emotions).
 
 ![Pipeline Overview](asset/SpeechCueLLM_diagram_proposed.png)
 *Figure 1: End-to-end pipeline illustrating the audio frontend, feature extraction (OpenSMILE), and the LLM inference engine.*
@@ -15,6 +15,7 @@ This project builds upon the **SpeechCueLLM** architecture, introducing signific
 
 * **Structured Prompting Strategy:** Replaced unstructured narrative prompts with a rigorous **JSON-style structured format**. This improved token efficiency by **~30%** and reduced model hallucination.
 * **Enhanced Feature Extraction:** Integrated the **OpenSMILE** toolkit to extract prosodic and spectral features, enriching the context provided to the LLM beyond standard ASR.
+* **Emotional Dimensions Integration:** Integrated emotional dimensions (valence, arousal, dominance) into the feature set, enriching the context provided to the LLM.
 * **Dynamic Feature Masking:** Implemented a training strategy that randomly masks specific modalities (audio/text) during fine-tuning. This forces the model to learn robust representations, preventing over-reliance on a single data stream.
 * **Automated Audio Frontend:** Developed a dedicated `audio_frontend` module that automates the pipeline from raw `.wav` to **ASR** (Whisper), decoupled from the LLM environment.
 
@@ -26,6 +27,7 @@ This project builds upon the **SpeechCueLLM** architecture, introducing signific
 A standalone module designed to handle raw signal processing.
 * **ASR Integration:** Uses OpenAI Whisper to generate high-fidelity transcripts.
 * **VAD Regressor:** Predicts emotional dimensions (valence, arousal, dominance) of raw audio.
+* **Gender Classifier:** Classify the gender of speakers.
 * **Environment Isolation:** Runs in a dedicated environment to manage audio dependency conflicts (e.g., `ffmpeg`, `sox`) separately from the LLM stack.
 
 ### 2. The LLM Engine (Llama-3)
