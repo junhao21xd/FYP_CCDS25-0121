@@ -90,11 +90,3 @@ def process_file(input_path):
 
     with open(output_test_csv_path, 'w') as f:
         json.dump(output_test_data, f, indent=2)
- 
-    return 0
-
-# --- EXECUTION ---
-# 1. Process Train (and learn the min/max scaling from it)
-process_file(TRAIN_FILE)
-
-print("\nDone!")

@@ -1,1 +1,2 @@
 from .whisper_asr import run_asr
+from .gender_classifier import train_gender_classifier, run_gender_classifier_inference, run_gender_classifier_evaluation

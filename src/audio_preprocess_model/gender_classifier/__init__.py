@@ -1,1 +1,2 @@
-from .gender_classifier import train, test
+from .train_gender_classifier import train_gender_classifier
+from .run_gender_classifier import run_gender_classifier_inference, run_gender_classifier_evaluation

@@ -12,8 +12,6 @@ Generate transcription of audio in (input_json) with ASR model (model_id).
 The output is stored in (output_json).
 Calculate Word Error Rate (WER) or normalised WER if requested.
 '''
-
-# def asr_inference(asr,data):
     
 def run_asr(input_json, output_json, model_id="openai/whisper-large-v3-turbo", calc_wer=False, normalize_wer=False):    
     # --- 1. SETUP MODEL ---
@@ -51,7 +49,7 @@ def run_asr(input_json, output_json, model_id="openai/whisper-large-v3-turbo", c
     total_ref_words = 0
     
     for i, item in enumerate(data):
-        audio_path = item["path"]
+        audio_path = item.get("path") or item.get("audio_filepath")
         ground_truth = item.get("utterance", "")
 
         # Extract ID for logging (optional, keeps your console clean)
